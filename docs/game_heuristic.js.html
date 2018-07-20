@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: game/heuristic.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: game/heuristic.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Created by Martyin Kornél
+ */
+
+/**
+ * Heurisztikát számol legfeljebb három játékos számára
+ *
+ * @param actualGameState {GameState} Aktuális játékállás
+ * @returns {{1: number, 2: number, 3: number}}
+ */
+function heuristic(actualGameState){
+    var heur = {1:0,2:0,3:0};
+    for(var x = 1; x &lt;= actualGameState.stageSize;x++){
+        for(var y = 1; y &lt;= actualGameState.stageSize;y++){
+            for(var z = 1; z &lt;= actualGameState.stageSize;z++){
+                var actualField = actualGameState.table[x][y][z];
+                if(actualField != 0){
+                    var clusterSize = calculateNeighborhood(actualGameState,x,y,z);
+                    if(clusterSize > heur[actualField]){
+                        heur[actualField] = clusterSize;
+                    }
+                }
+            }
+        }
+    }
+
+    return heur;
+}
+
+/**
+ * Megszámolja az aktuális koordinátával szomszédos azonos figurákat
+ *
+ * @param gameState Aktuális játékállás
+ * @param x {number} x koordináta a játéktérben
+ * @param y {number} y koordináta a játéktérben
+ * @param z {number} z koordináta a játéktérben
+ * @returns {number}
+ */
+function calculateNeighborhood(gameState,x,y,z){
+    var count = 0;
+
+    /*
+     for(var i=0; i &lt; utils.directions; i++ ){
+        if( gameState.table[x+utils.directions[i].x] &amp;&amp;
+            gameState.table[x+utils.directions[i].x][y+utils.directions[i].y] &amp;&amp;
+            gameState.table[x+utils.directions[i].x][y+utils.directions[i].y][z+utils.directions[i].z] == gameState.table[x][y][z]){
+            count++;
+        }
+     }
+     */
+
+
+    // Sarkok
+    if(x==1 &amp;&amp; x==y &amp;&amp; y==z){
+        if(gameState.table[x][y+1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y+1][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y+1][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+
+    if(x==1 &amp;&amp; y==gameState.stageSize &amp;&amp; x==z){
+        if(gameState.table[x][y-1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y-1][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y-1][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+
+    if(x==1 &amp;&amp; y==x &amp;&amp; z==gameState.stageSize){
+        if(gameState.table[x][y+1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y+1][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y+1][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+
+    if(x==1 &amp;&amp; y==gameState.stageSize &amp;&amp; z==gameState.stageSize){
+        if(gameState.table[x][y-1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y-1][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y-1][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+
+    if(x==gameState.stageSize &amp;&amp; y==1 &amp;&amp; z==1){
+        if(gameState.table[x][y+1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y+1][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y+1][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+
+    if(x==gameState.stageSize &amp;&amp; y==gameState.stageSize &amp;&amp; z==1){
+        if(gameState.table[x][y-1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y-1][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y-1][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+
+    if(x==gameState.stageSize &amp;&amp; y==1 &amp;&amp; z==gameState.stageSize){
+        if(gameState.table[x][y+1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y+1][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y+1][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+
+    if(x==gameState.stageSize &amp;&amp; y==gameState.stageSize &amp;&amp; z==gameState.stageSize){
+        if(gameState.table[x][y-1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y-1][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y-1][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+
+
+
+
+
+    // Szélközepek
+
+    if(x==1 &amp;&amp; y==1 &amp;&amp; z==Math.ceil(gameState.stageSize/2)){
+        if(gameState.table[x][y+1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y+1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+
+    if(x==1 &amp;&amp; y==Math.ceil(gameState.stageSize/2) &amp;&amp; z==1){
+        if(gameState.table[x+1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y+1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y-1][z] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+
+    if(x==1 &amp;&amp; y==Math.ceil(gameState.stageSize/2) &amp;&amp; z==gameState.stageSize){
+        if(gameState.table[x+1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y+1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y-1][z] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+
+    if(x==1 &amp;&amp; y==gameState.stageSize &amp;&amp; z==Math.ceil(gameState.stageSize/2)){
+        if(gameState.table[x][y-1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y-1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+
+    if(x==Math.ceil(gameState.stageSize/2) &amp;&amp; y==1 &amp;&amp; z==1){
+        if(gameState.table[x][y+1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y+1][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+
+    if(x==Math.ceil(gameState.stageSize/2) &amp;&amp; y==1 &amp;&amp; z==gameState.stageSize){
+        if(gameState.table[x][y+1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y+1][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+
+    if(x==Math.ceil(gameState.stageSize/2) &amp;&amp; y==gameState.stageSize &amp;&amp; z==1){
+        if(gameState.table[x][y-1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y-1][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+
+    if(x==Math.ceil(gameState.stageSize/2) &amp;&amp; y==gameState.stageSize &amp;&amp; z==gameState.stageSize){
+        if(gameState.table[x][y-1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y-1][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+
+    if(x==gameState.stageSize &amp;&amp; y==Math.ceil(gameState.stageSize/2) &amp;&amp; z==1){
+        if(gameState.table[x-1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y+1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y-1][z] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+
+    if(x==gameState.stageSize &amp;&amp; y==Math.ceil(gameState.stageSize/2) &amp;&amp; z==gameState.stageSize){
+        if(gameState.table[x-1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y+1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y-1][z] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+
+    if(x==gameState.stageSize &amp;&amp; y==1 &amp;&amp; z==Math.ceil(gameState.stageSize/2)){
+        if(gameState.table[x-1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y+1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y+1][z] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+
+    if(x==gameState.stageSize &amp;&amp; y==gameState.stageSize &amp;&amp; z==Math.ceil(gameState.stageSize/2)){
+        if(gameState.table[x-1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y-1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y-1][z] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+
+
+    //Lapközepek
+    if(x==Math.ceil(gameState.stageSize/2) &amp;&amp; y==x &amp;&amp; z==1){
+        if(gameState.table[x][y+1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y-1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+    if(x==Math.ceil(gameState.stageSize/2) &amp;&amp; y==1 &amp;&amp; z==x){
+        if(gameState.table[x][y][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y+1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+    if(x==Math.ceil(gameState.stageSize/2) &amp;&amp; y==x &amp;&amp; z==gameState.stageSize){
+        if(gameState.table[x][y+1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y-1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+    if(x==Math.ceil(gameState.stageSize/2) &amp;&amp; y==gameState.stageSize &amp;&amp; z==x){
+        if(gameState.table[x][y][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y-1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+
+    if(x==1 &amp;&amp; y==Math.ceil(gameState.stageSize/2) &amp;&amp; z==y){
+        if(gameState.table[x][y][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y-1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y+1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+    if(x==gameState.stageSize &amp;&amp; y==Math.ceil(gameState.stageSize/2) &amp;&amp; z==y){
+        if(gameState.table[x][y][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y+1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y-1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+
+
+
+
+    //Absz. középpont
+    if(x==Math.ceil(gameState.stageSize/2) &amp;&amp; y==x &amp;&amp; z==x){
+        if(gameState.table[x][y-1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y+1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y+1][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y-1][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y-1][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x][y+1][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y-1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y+1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y-1][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y-1][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y+1][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x-1][y+1][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y+1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y-1][z] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y+1][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y-1][z+1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y+1][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+        if(gameState.table[x+1][y-1][z-1] == gameState.table[x][y][z]){
+            count++
+        }
+    }
+
+    return count;
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Assets.html">Assets</a></li><li><a href="GameState.html">GameState</a></li><li><a href="Op.html">Op</a></li><li><a href="Operator.html">Operator</a></li><li><a href="PlayerControls.html">PlayerControls</a></li><li><a href="Renderer.html">Renderer</a></li><li><a href="ScanHead.html">ScanHead</a></li><li><a href="Utils.html">Utils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#calculateNeighborhood">calculateNeighborhood</a></li><li><a href="global.html#cpuMove">cpuMove</a></li><li><a href="global.html#gameStep">gameStep</a></li><li><a href="global.html#heuristic">heuristic</a></li><li><a href="global.html#maxN">maxN</a></li><li><a href="global.html#maxNRec">maxNRec</a></li><li><a href="global.html#renderState">renderState</a></li><li><a href="global.html#stageSize">stageSize</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Sat May 14 2016 19:35:50 GMT+0200 (Central Europe Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
